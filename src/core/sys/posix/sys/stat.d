@@ -76,11 +76,11 @@ int    mkdir(in char*, mode_t);
 int    mkfifo(in char*, mode_t);
 int    stat(in char*, stat*);
 mode_t umask(mode_t);
-*/
+ */
 
 version( linux )
 {
-    static if( __USE_LARGEFILE64 )
+    static if(__WORDSIZE==64)
     {
         private alias uint _pad_t;
     }
@@ -93,50 +93,64 @@ version( linux )
     {
         dev_t       st_dev;
         _pad_t      __pad1;
-      static if( __USE_FILE_OFFSET64 )
-      {
-        ino_t       __st_ino;
-      }
-      else
-      {
-        ino_t       st_ino;
-      }
-        mode_t      st_mode;
-        nlink_t     st_nlink;
+        static if( !__USE_FILE_OFFSET64 || __WORDSIZE==64 )
+        {
+            ino_t       st_ino;
+        }
+        else
+        {
+            ino_t       __st_ino;
+        }
+        static if (__WORDSIZE==32) {
+            mode_t      st_mode;
+            nlink_t     st_nlink;
+        }
+        else {
+            nlink_t     st_nlink;
+            mode_t      st_mode;
+        }
         uid_t       st_uid;
         gid_t       st_gid;
+        static if(__WORDSIZE==64) {
+            _pad_t pad0;
+        }
         dev_t       st_rdev;
-        _pad_t      __pad2;
+        static if(__WORDSIZE==32) {
+            _pad_t      __pad2;
+        }
         off_t       st_size;
         blksize_t   st_blksize;
         blkcnt_t    st_blocks;
-      static if( false /*__USE_MISC*/ ) // true if _BSD_SOURCE || _SVID_SOURCE
-      {
-        timespec    st_atim;
-        timespec    st_mtim;
-        timespec    st_ctim;
-        alias st_atim.tv_sec st_atime;
-        alias st_mtim.tv_sec st_mtime;
-        alias st_ctim.tv_sec st_ctime;
-      }
-      else
-      {
-        time_t      st_atime;
-        c_ulong     st_atimensec;
-        time_t      st_mtime;
-        c_ulong     st_mtimensec;
-        time_t      st_ctime;
-        c_ulong     st_ctimensec;
-      }
-      static if( __USE_FILE_OFFSET64 )
-      {
-        ino_t       st_ino;
-      }
-      else
-      {
-        c_ulong     __unused4;
-        c_ulong     __unused5;
-      }
+        static if( __USE_MISC ) // true if _BSD_SOURCE || _SVID_SOURCE
+        {
+            timespec    st_atim;
+            timespec    st_mtim;
+            timespec    st_ctim;
+            alias st_atim.tv_sec st_atime;
+            alias st_mtim.tv_sec st_mtime;
+            alias st_ctim.tv_sec st_ctime;
+        }
+        else
+        {
+            time_t      st_atime;
+            c_ulong     st_atimensec;
+            time_t      st_mtime;
+            c_ulong     st_mtimensec;
+            time_t      st_ctime;
+            c_ulong     st_ctimensec;
+        }
+        static if(__WORDSIZE==64) {
+            c_long __unused[3];
+        }
+        static if( __USE_FILE_OFFSET64 )
+        {
+            ino_t       st_ino;
+        }
+        else
+        {
+            c_ulong     __unused4;
+            c_ulong     __unused5;
+        }
     }
 
     enum S_IRUSR    = 0400;
@@ -192,21 +206,21 @@ else version( OSX )
         uid_t       st_uid;
         gid_t       st_gid;
         dev_t       st_rdev;
-      static if( false /*!_POSIX_C_SOURCE || _DARWIN_C_SOURCE*/ )
-      {
-          timespec  st_atimespec;
-          timespec  st_mtimespec;
-          timespec  st_ctimespec;
-      }
-      else
-      {
-        time_t      st_atime;
-        c_long      st_atimensec;
-        time_t      st_mtime;
-        c_long      st_mtimensec;
-        time_t      st_ctime;
-        c_long      st_ctimensec;
-      }
+        static if( false /*!_POSIX_C_SOURCE || _DARWIN_C_SOURCE*/ )
+        {
+    	timespec  st_atimespec;
+    	timespec  st_mtimespec;
+    	timespec  st_ctimespec;
+        }
+        else
+        {
+    	time_t      st_atime;
+    	c_long      st_atimensec;
+    	time_t      st_mtime;
+    	c_long      st_mtimensec;
+    	time_t      st_ctime;
+    	c_long      st_ctimensec;
+        }
         off_t       st_size;
         blkcnt_t    st_blocks;
         blksize_t   st_blksize;
@@ -239,7 +253,7 @@ else version( OSX )
     {
         extern (D) bool S_ISTYPE( mode_t mode, uint mask )
         {
-            return ( mode & S_IFMT ) == mask;
+    	return ( mode & S_IFMT ) == mask;
         }
     }
 
@@ -306,7 +320,7 @@ else version( FreeBSD )
     {
         extern (D) bool S_ISTYPE( mode_t mode, uint mask )
         {
-            return ( mode & S_IFMT ) == mask;
+    	return ( mode & S_IFMT ) == mask;
         }
     }
 
@@ -333,23 +347,23 @@ version( Posix )
 
 version( linux )
 {
-  static if( __USE_LARGEFILE64 )
-  {
-    int   fstat64(int, stat_t*);
-    alias fstat64 fstat;
+    static if( __USE_LARGEFILE64 )
+    {
+        int   fstat64(int, stat_t*);
+        alias fstat64 fstat;
 
-    int   lstat64(in char*, stat_t*);
-    alias lstat64 lstat;
+        int   lstat64(in char*, stat_t*);
+        alias lstat64 lstat;
 
-    int   stat64(in char*, stat_t*);
-    alias stat64 stat;
-  }
-  else
-  {
-    int   fstat(int, stat_t*);
-    int   lstat(in char*, stat_t*);
-    int   stat(in char*, stat_t*);
-  }
+        int   stat64(in char*, stat_t*);
+        alias stat64 stat;
+    }
+    else
+    {
+        int   fstat(int, stat_t*);
+        int   lstat(in char*, stat_t*);
+        int   stat(in char*, stat_t*);
+    }
 }
 else version( Posix )
 {

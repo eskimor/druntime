@@ -19,6 +19,7 @@ private import core.stdc.stdint;
 public import core.stdc.stddef; // for size_t
 public import core.stdc.time;   // for clock_t, time_t
 
+
 extern (C):
 
 //
@@ -42,7 +43,7 @@ uid_t
 
 version( linux )
 {
-  static if( __USE_FILE_OFFSET64 )
+  static if( __USE_FILE_OFFSET64  || __WORDSIZE==64)
   {
     alias long      blkcnt_t;
     alias ulong     ino_t;
