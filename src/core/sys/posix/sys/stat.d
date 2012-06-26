@@ -89,6 +89,26 @@ version( linux )
         private alias ushort _pad_t;
     }
 
+	version(unittest) {
+		extern (C) {
+			int test_stat_struct(stat_t* t);
+        //return (t->st_dev==0 && t->st_uid==1 && t->st_blksize==2 && st_blocks==3 && st_atim.tv_sec==4 && st_ino==5);
+			size_t stat_struct_size(); 
+        //return sizeof(struct stat);
+               
+		}
+	}
+	
+	unittest {
+		stat_t t;
+		t.st_dev=0; t.st_uid=1; t.st_blksize=2;
+		t.st_nlink=7;t.st_mode=6; t.st_blocks=3;
+		t.st_atim.tv_sec=4;
+		t.st_ino=5;
+		//t.__st_ino=8;
+		assert(test_stat_struct(&t)!=0);
+		assert(stat_struct_size()==stat_t.sizeof);
+	}
     struct stat_t
     {
         dev_t       st_dev;

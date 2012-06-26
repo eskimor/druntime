@@ -542,6 +542,10 @@ $(OBJDIR)/errno_c.o : src/core/stdc/errno.c
 	@mkdir -p $(OBJDIR)
 	$(CC) -c $(CFLAGS) $< -o$@
 
+$(OBJDIR)/stat_unittest.o : src/core/sys/posix/sys/stat_unittest.c
+	@mkdir -p $(OBJDIR)
+	$(CC) -c $(CFLAGS) $< -o$@ -D_FILE_OFFSET_BITS=64
+
 $(OBJDIR)/threadasm.o : src/core/threadasm.S
 	@mkdir -p $(OBJDIR)
 	$(CC) -Wa,-noexecstack -c $(CFLAGS) $< -o$@
@@ -563,9 +567,9 @@ endif
 $(addprefix $(OBJDIR)/,$(DISABLED_TESTS)) :
 	@echo $@ - disabled
 
-$(OBJDIR)/% : src/%.d $(DRUNTIME) $(OBJDIR)/emptymain.d
+$(OBJDIR)/% : src/%.d $(DRUNTIME) $(OBJDIR)/emptymain.d $(OBJDIR)/stat_unittest.o
 	@echo Testing $@
-	@$(DMD) $(UDFLAGS) -unittest -of$@ $(OBJDIR)/emptymain.d $< -L-Llib -debuglib=$(DRUNTIME_BASE) -defaultlib=$(DRUNTIME_BASE)
+	@$(DMD) $(UDFLAGS) -unittest -of$@ $(OBJDIR)/emptymain.d $< -L-Llib -debuglib=$(DRUNTIME_BASE) -defaultlib=$(DRUNTIME_BASE) $(OBJDIR)/stat_unittest.o
 # make the file very old so it builds and runs again if it fails
 	@touch -t 197001230123 $@
 # run unittest in its own directory
