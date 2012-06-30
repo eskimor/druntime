@@ -140,6 +140,7 @@ MANIFEST= \
 	src/core/sys/posix/sys/shm.d \
 	src/core/sys/posix/sys/socket.d \
 	src/core/sys/posix/sys/stat.d \
+	src/core/sys/posix/sys/statvfs.d \
 	src/core/sys/posix/sys/time.d \
 	src/core/sys/posix/sys/types.d \
 	src/core/sys/posix/sys/uio.d \
@@ -283,6 +284,7 @@ SRC_D_MODULES = \
 	core/sys/posix/sys/select \
 	core/sys/posix/sys/socket \
 	core/sys/posix/sys/stat \
+	core/sys/posix/sys/statvfs \
 	core/sys/posix/sys/wait \
 	core/sys/posix/netdb \
 	core/sys/posix/sys/utsname \
@@ -488,6 +490,7 @@ IMPORTS=\
 	$(IMPDIR)/core/sys/posix/sys/shm.di \
 	$(IMPDIR)/core/sys/posix/sys/socket.di \
 	$(IMPDIR)/core/sys/posix/sys/stat.di \
+	$(IMPDIR)/core/sys/posix/sys/statvfs.di \
 	$(IMPDIR)/core/sys/posix/sys/time.di \
 	$(IMPDIR)/core/sys/posix/sys/types.di \
 	$(IMPDIR)/core/sys/posix/sys/uio.di \
@@ -542,7 +545,7 @@ $(OBJDIR)/errno_c.o : src/core/stdc/errno.c
 	@mkdir -p $(OBJDIR)
 	$(CC) -c $(CFLAGS) $< -o$@
 
-$(OBJDIR)/stat_unittest.o : src/core/sys/posix/sys/stat_unittest.c
+$(OBJDIR)/struct_check_unittests.o : src/core/sys/posix/sys/struct_check_unittests.c
 	@mkdir -p $(OBJDIR)
 	$(CC) -c $(CFLAGS) $< -o$@ -D_FILE_OFFSET_BITS=64
 
@@ -567,9 +570,9 @@ endif
 $(addprefix $(OBJDIR)/,$(DISABLED_TESTS)) :
 	@echo $@ - disabled
 
-$(OBJDIR)/% : src/%.d $(DRUNTIME) $(OBJDIR)/emptymain.d $(OBJDIR)/stat_unittest.o
+$(OBJDIR)/% : src/%.d $(DRUNTIME) $(OBJDIR)/emptymain.d $(OBJDIR)/struct_check_unittests.o
 	@echo Testing $@
-	@$(DMD) $(UDFLAGS) -unittest -of$@ $(OBJDIR)/emptymain.d $< -L-Llib -debuglib=$(DRUNTIME_BASE) -defaultlib=$(DRUNTIME_BASE) $(OBJDIR)/stat_unittest.o
+	@$(DMD) $(UDFLAGS) -unittest -of$@ $(OBJDIR)/emptymain.d $< -L-Llib -debuglib=$(DRUNTIME_BASE) -defaultlib=$(DRUNTIME_BASE) $(OBJDIR)/struct_check_unittests.o
 # make the file very old so it builds and runs again if it fails
 	@touch -t 197001230123 $@
 # run unittest in its own directory

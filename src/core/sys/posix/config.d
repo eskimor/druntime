@@ -26,7 +26,9 @@ version( linux )
     enum bool  __USE_XOPEN2K8		= true; //#if (_POSIX_C_SOURCE - 0) >= 200809L
     enum bool _BSD_SOURCE			= true; /// Seems to be default in gcc.
     enum bool _SVID_SOURCE   		= true; /// Ditto
-
+    version(linux) {
+	    enum bool __USE_GNU				= true;
+    }
     static if(_BSD_SOURCE || _SVID_SOURCE) {
     	enum bool __USE_MISC			= true; 
     }

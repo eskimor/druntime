@@ -46,14 +46,15 @@ version( linux )
   static if( __USE_FILE_OFFSET64  || __WORDSIZE==64)
   {
     alias long      blkcnt_t;
+    alias ulong     ino_t;
     alias long      off_t;
   }
   else
   {
     alias c_long    blkcnt_t;
+    alias c_ulong   ino_t;
     alias c_long    off_t;
   }
-    alias c_ulong   ino_t;
     alias c_long    blksize_t;
     alias ulong     dev_t;
     alias uint      gid_t;

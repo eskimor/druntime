@@ -91,9 +91,9 @@ version( linux )
 
 	version(unittest) {
 		extern (C) {
-			int test_stat_struct(stat_t* t);
+			int c_test_stat_struct(stat_t* t);
         //return (t->st_dev==0 && t->st_uid==1 && t->st_blksize==2 && st_blocks==3 && st_atim.tv_sec==4 && st_ino==5);
-			size_t stat_struct_size(); 
+			size_t c_get_stat_struct_size(); 
         //return sizeof(struct stat);
                
 		}
@@ -105,9 +105,10 @@ version( linux )
 		t.st_nlink=7;t.st_mode=6; t.st_blocks=3;
 		t.st_atim.tv_sec=4;
 		t.st_ino=5;
+		//assert(cast(void*)&t.st_ino-cast(void*)&t.__pad1==80);
 		//t.__st_ino=8;
-		assert(test_stat_struct(&t)!=0);
-		assert(stat_struct_size()==stat_t.sizeof);
+		assert(c_test_stat_struct(&t)!=0);
+		assert(c_get_stat_struct_size()==stat_t.sizeof);
 	}
     struct stat_t
     {
@@ -115,11 +116,11 @@ version( linux )
         _pad_t      __pad1;
         static if( !__USE_FILE_OFFSET64 || __WORDSIZE==64 )
         {
-            ino_t       st_ino;
+            uint       st_ino;
         }
         else
         {
-            ino_t       __st_ino;
+            uint       __st_ino;
         }
         static if (__WORDSIZE==32) {
             mode_t      st_mode;
