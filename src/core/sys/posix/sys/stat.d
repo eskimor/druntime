@@ -113,7 +113,9 @@ version( linux )
     struct stat_t
     {
         dev_t       st_dev;
-        _pad_t      __pad1;
+	static if(__WORDSIZE==32) {
+		_pad_t      __pad1;
+	}
         static if( !__USE_FILE_OFFSET64 || __WORDSIZE==64 )
         {
             uint       st_ino;
