@@ -18,9 +18,14 @@ version(linux) {
 	}
 	version(unittest) {
 		extern size_t c_get_statvfs_size();
+		extern int c_check_statvfs_struct(statvfs_t* t);
 	}
 	unittest {
 		assert(statvfs_t.sizeof==c_get_statvfs_size());
+		statvfs_t t;
+		foreach(i, m ; __traits(allMembers, statvfs_t)) {
+			mixin("t."~m~"=i+1;");
+		}
 	}
 	struct statvfs_t
 	{

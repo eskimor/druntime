@@ -163,15 +163,17 @@ version( linux )
         static if(__WORDSIZE==64) {
             c_long __unused[3];
         }
-        static if( __USE_FILE_OFFSET64 )
-        {
-            ino_t       st_ino;
-        }
-        else
-        {
-            c_ulong     __unused4;
-            c_ulong     __unused5;
-        }
+	else {
+		static if( __USE_FILE_OFFSET64 )
+        	{
+            		ino_t       st_ino;
+        	}
+        	else
+		{
+			c_ulong     __unused4;
+			c_ulong     __unused5;
+		}
+	}
     }
 
     enum S_IRUSR    = 0400;
